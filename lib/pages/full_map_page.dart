@@ -24,6 +24,7 @@ class _FullMapPageState extends State<FullMapPage> {
   late GoogleMapController _mapController;
   Marker? _origin;
   Marker? _destination;
+  Marker? _intermediate;
   PolylinePoints polylinePoints = PolylinePoints();
   List<PointLatLng>? _pointLatLng;
 
@@ -93,10 +94,34 @@ class _FullMapPageState extends State<FullMapPage> {
                 );
               },
               child: Text(
-                'origin',
+                'start',
                 style: GoogleFonts.inter(
                   textStyle: const TextStyle(
                     color: kgreen02075310,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          if (_intermediate != null)
+            TextButton(
+              onPressed: () {
+                _mapController.animateCamera(
+                  CameraUpdate.newCameraPosition(
+                    CameraPosition(
+                      target: _intermediate!.position,
+                      zoom: 14.5,
+                      tilt: 50,
+                    ),
+                  ),
+                );
+              },
+              child: Text(
+                'mid',
+                style: GoogleFonts.inter(
+                  textStyle: const TextStyle(
+                    color: kcyan,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -117,10 +142,10 @@ class _FullMapPageState extends State<FullMapPage> {
                 );
               },
               child: Text(
-                'destination',
+                'stop',
                 style: GoogleFonts.inter(
                   textStyle: const TextStyle(
-                    color: kblue12915824210,
+                    color: kred23913313310,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -154,6 +179,7 @@ class _FullMapPageState extends State<FullMapPage> {
         markers: {
           if (_origin != null) _origin!,
           if (_destination != null) _destination!,
+          if (_intermediate != null) _intermediate!,
         },
         onLongPress: _addMarker,
       ),
@@ -171,7 +197,8 @@ class _FullMapPageState extends State<FullMapPage> {
   }
 
   void _addMarker(LatLng pos) async {
-    if (_origin == null || (_origin != null && _destination != null)) {
+    if (_origin == null ||
+        (_origin != null && _destination != null && _intermediate != null)) {
       //set origin
       setState(() {
         _origin = Marker(
@@ -184,16 +211,32 @@ class _FullMapPageState extends State<FullMapPage> {
         );
         //Reset destination
         _destination = null;
+        _intermediate = null;
         _pointLatLng = null;
       });
-    } else {
+    } else if (_intermediate == null &&
+        _origin != null &&
+        _destination == null) {
+      setState(() {
+        _intermediate = Marker(
+          markerId: const MarkerId('Charging station'),
+          infoWindow: const InfoWindow(title: 'Charging station'),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueAzure,
+          ),
+          position: pos,
+        );
+      });
+    } else if (_destination == null &&
+        _origin != null &&
+        _intermediate != null) {
       //set destination
       setState(() {
         _destination = Marker(
           markerId: const MarkerId('destination'),
           infoWindow: const InfoWindow(title: 'destination'),
           icon: BitmapDescriptor.defaultMarkerWithHue(
-            BitmapDescriptor.hueBlue,
+            BitmapDescriptor.hueRed,
           ),
           position: pos,
         );
@@ -225,9 +268,27 @@ class _FullMapPageState extends State<FullMapPage> {
         locationModel: locationModeldestination,
       );
 
+      List<DestinationModel> intermediateList = <DestinationModel>[];
+
+      final LatLangModel latLangModelIntermediate = LatLangModel(
+        lat: _intermediate!.position.latitude,
+        lang: _intermediate!.position.longitude,
+      );
+
+      final LocationModel locationModelIntermidiate = LocationModel(
+        latLangModel: latLangModelIntermediate,
+      );
+
+      final DestinationModel intermediateModel = DestinationModel(
+        locationModel: locationModelIntermidiate,
+      );
+
+      intermediateList.add(intermediateModel);
+
       final responseModel = await send(
         originModel: originModel,
         destinationModel: destinationModel,
+        intermediate: intermediateList,
       );
 
       final polylineEncoded =
@@ -244,6 +305,7 @@ class _FullMapPageState extends State<FullMapPage> {
   Future<RouteResponseModel> send({
     required OriginModel originModel,
     required DestinationModel destinationModel,
+    required List<DestinationModel> intermediate,
   }) async {
     final URI uri = URI();
     final RoutesRepository repository = RoutesRepository(uri);
@@ -256,6 +318,7 @@ class _FullMapPageState extends State<FullMapPage> {
     final RoutesRequestModel model = RoutesRequestModel(
       originModel: originModel,
       destinationModel: destinationModel,
+      intermediate: intermediate,
       travelMode: 'DRIVE',
       routingPreference: 'TRAFFIC_AWARE',
       departureTime:

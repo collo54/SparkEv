@@ -6,6 +6,7 @@ class RoutesRequestModel {
   RoutesRequestModel({
     required this.originModel,
     required this.destinationModel,
+    required this.intermediate,
     required this.travelMode,
     required this.routingPreference,
     required this.departureTime,
@@ -17,6 +18,7 @@ class RoutesRequestModel {
 
   final OriginModel originModel;
   final DestinationModel destinationModel;
+  final List<DestinationModel> intermediate;
   final String travelMode;
   final String routingPreference;
   final String departureTime;
@@ -29,6 +31,8 @@ class RoutesRequestModel {
     return {
       'origin': originModel.toMap(),
       'destination': destinationModel.toMap(),
+      'intermediates':
+          intermediate.map((intermid) => intermid.toMap()).toList(),
       'travelMode': travelMode,
       'routingPreference': routingPreference,
       'departureTime': departureTime,
