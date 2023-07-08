@@ -1,0 +1,60 @@
+name: spark_ev
+description: The Green Economy app.
+
+publish_to: 'none' 
+
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.5 <4.0.0'
+
+
+dependencies:
+  collection: ^1.17.1
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  realm: ^1.2.0   
+
+  cupertino_icons: ^1.0.2
+  rive: ^0.11.4
+  google_fonts: ^4.0.4
+  google_maps_flutter: ^2.3.1
+  google_sign_in: ^6.1.4
+  flutter_polyline_points: ^1.0.0
+  http: ^0.13.6
+  dio: ^5.2.1+1
+  
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+  change_app_package_name: ^1.1.0
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+   - assets/images/clock.png 
+   - assets/images/email.png
+   - assets/images/google-maps.png
+   - assets/images/launchicon.png
+   - assets/images/left1.png
+   - assets/images/left2.png
+   - assets/images/listicon.png
+   - assets/images/new.png
+   - assets/images/OpenStreetMap.png
+   - assets/images/padlock.png
+   - assets/images/pencil.png
+   - assets/images/pin.png
+   - assets/images/star2.png
+   - assets/images/user1.png
+   - assets/animations/vehicle_loader2.riv 
+   - assets/animations/vehicle_loader3.riv            
+
+

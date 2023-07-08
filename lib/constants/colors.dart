@@ -1,0 +1,28 @@
+import 'package:flutter/material.dart';
+
+const Color kwhite25525525510 = Color.fromRGBO(255, 255, 255, 1);
+const Color kwhite25525525500 = Color.fromRGBO(255, 255, 255, 0);
+const Color kwhite24424424410 = Color.fromRGBO(244, 244, 244, 1);
+const Color kwhite21421421410 = Color.fromRGBO(214, 214, 214, 1);
+const Color kwhite24024024010 = Color.fromRGBO(240, 240, 240, 1);
+const Color kpurple13413323910 = Color.fromRGBO(134, 133, 239, 1);
+const Color kpurple1341332391 = Color.fromRGBO(75, 72, 255, 1);
+const Color kblackgrey62606310 = Color.fromRGBO(62, 60, 63, 1);
+const Color kblackgrey86868610 = Color.fromRGBO(86, 86, 86, 1);
+const Color kblackgrey48484810 = Color.fromRGBO(48, 48, 48, 1);
+const Color kblackgrey79797910 = Color.fromRGBO(79, 79, 79, 1);
+const Color kblackgrey79797907 = Color.fromRGBO(79, 79, 79, .7);
+const Color kblackgrey79797903 = Color.fromRGBO(79, 79, 79, .3);
+const Color kgrey22222222210 = Color.fromRGBO(222, 222, 222, 1);
+const Color kgrey23723723710 = Color.fromRGBO(237, 237, 237, 1);
+const Color kgrey21721721710 = Color.fromRGBO(217, 217, 217, 1);
+const Color kgrey12212312510 = Color.fromRGBO(122, 123, 125, 1);
+const Color kgrey13313413610 = Color.fromRGBO(133, 134, 136, 1);
+const Color kgrey15515515510 = Color.fromRGBO(155, 155, 155, 1);
+const Color kgreen02075310 = Color.fromRGBO(0, 207, 53, 1);
+const Color kgreen12019413510 = Color.fromRGBO(120, 193, 135, 1);
+const Color kgreen11719013010 = Color.fromRGBO(117, 190, 130, 1);
+const Color kteal16620520710 = Color.fromRGBO(166, 205, 207, 1);
+const Color kblue9813424010 = Color.fromRGBO(98, 134, 240, 1);
+const Color kblue12915824210 = Color.fromRGBO(129, 158, 242, 1);
+const Color kblack15161810 = Color.fromRGBO(15, 16, 18, 1);
