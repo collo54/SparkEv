@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:spark_ev/apis/routes_repository.dart';
+import 'package:spark_ev/apis/repository.dart';
 import 'package:spark_ev/apis/uri.dart';
 import 'package:spark_ev/constants/colors.dart';
 import 'package:spark_ev/models/destination.dart';
 import 'package:spark_ev/models/latlang.dart';
 import 'package:spark_ev/models/location.dart';
 import 'package:spark_ev/models/origin.dart';
+import 'package:spark_ev/models/reverse_geocoding_models/reverse_geocoding_response.dart';
 import 'package:spark_ev/models/routes_modifires.dart';
 import 'package:spark_ev/models/routes_request.dart';
 import 'package:spark_ev/models/routes_response.dart';
@@ -118,7 +119,7 @@ class _FullMapPageState extends State<FullMapPage> {
                 );
               },
               child: Text(
-                'mid',
+                'charge',
                 style: GoogleFonts.inter(
                   textStyle: const TextStyle(
                     color: kcyan,
@@ -188,7 +189,15 @@ class _FullMapPageState extends State<FullMapPage> {
         backgroundColor: kwhite25525525510,
         onPressed: () {
           _mapController.animateCamera(
-            CameraUpdate.newCameraPosition(_initialcameraPosition),
+            _intermediate != null
+                ? CameraUpdate.newCameraPosition(
+                    CameraPosition(
+                      target: LatLng(_intermediate!.position.latitude,
+                          _intermediate!.position.longitude),
+                      zoom: 10,
+                    ),
+                  )
+                : CameraUpdate.newCameraPosition(_initialcameraPosition),
           );
         },
         child: const Icon(Icons.center_focus_strong),
@@ -242,6 +251,11 @@ class _FullMapPageState extends State<FullMapPage> {
         );
       });
 
+      _reverseGeocode(
+        lat: _intermediate!.position.latitude,
+        lang: _intermediate!.position.longitude,
+      );
+
       final LatLangModel latLangModelOrigin = LatLangModel(
         lat: _origin!.position.latitude,
         lang: _origin!.position.longitude,
@@ -285,30 +299,34 @@ class _FullMapPageState extends State<FullMapPage> {
 
       intermediateList.add(intermediateModel);
 
-      final responseModel = await send(
+      final responseModel = await _getRoutes(
         originModel: originModel,
         destinationModel: destinationModel,
         intermediate: intermediateList,
       );
 
-      final polylineEncoded =
-          responseModel.routeItems.first.polylineModel.encodedPolyline;
-      List<PointLatLng> result = polylinePoints.decodePolyline(polylineEncoded);
-      debugPrint(result.first.latitude.toString());
+      if (responseModel.routeItems.isNotEmpty) {
+        final polylineEncoded =
+            responseModel.routeItems.first.polylineModel.encodedPolyline;
 
-      setState(() {
-        _pointLatLng = result;
-      });
+        List<PointLatLng> result =
+            polylinePoints.decodePolyline(polylineEncoded);
+        debugPrint(result.first.latitude.toString());
+
+        setState(() {
+          _pointLatLng = result;
+        });
+      }
     }
   }
 
-  Future<RouteResponseModel> send({
+  Future<RouteResponseModel> _getRoutes({
     required OriginModel originModel,
     required DestinationModel destinationModel,
     required List<DestinationModel> intermediate,
   }) async {
     final URI uri = URI();
-    final RoutesRepository repository = RoutesRepository(uri);
+    final Repository repository = Repository(uri);
 
     final RoutesModifiersModel routesModifiersModel = RoutesModifiersModel(
       avoidTolls: false,
@@ -329,8 +347,22 @@ class _FullMapPageState extends State<FullMapPage> {
       units: 'IMPERIAL',
     );
 
-    final response = await repository.getRoutes1(
+    final response = await repository.getRoutes(
       requestModel: model,
+    );
+    return response;
+  }
+
+  Future<ReverseGeocoding> _reverseGeocode({
+    required double lat,
+    required double lang,
+  }) async {
+    final URI uri = URI();
+    final Repository repository = Repository(uri);
+
+    final response = await repository.reverseGeolocate(
+      lat: lat,
+      lang: lang,
     );
     return response;
   }
