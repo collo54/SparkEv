@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "83247428077",
+    "project_id": "single-obelisk-389301",
+    "storage_bucket": "single-obelisk-389301.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:83247428077:android:d302e5307ec4a0e75477e4",
+        "android_client_info": {
+          "package_name": "com.example.spark_ev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "83247428077-c6tetj0ko92gj0t3s49o3qg21fl8v33f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.spark_ev",
+            "certificate_hash": "fb07c282bd2b7c25a2a509febb66ccdea4518ad5"
+          }
+        },
+        {
+          "client_id": "83247428077-6ja72eae9lis4nedri1i4tu0uj06tk5j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBU5AlIhju1ITqAU1oE7xQS4pUjHD1qjvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "83247428077-6ja72eae9lis4nedri1i4tu0uj06tk5j.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "83247428077-d0u5nlkbe6k922cv09ned3gfv53psdka.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.sparkEv.RunnerTests"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,11 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:realm/realm.dart';
 import 'package:rive/rive.dart';
 import 'package:spark_ev/constants/colors.dart';
-import 'package:spark_ev/pages/other_user_profile_page.dart';
+import 'package:spark_ev/pages/home_page.dart';
+
+import '../models/charger_type.dart';
+import '../models/charging_station.dart';
+import '../models/ev.dart';
+import '../models/user_model.dart';
+import '../services/auth_service.dart';
 
 class OnboardingMobileLayout extends StatelessWidget {
   const OnboardingMobileLayout({super.key});
+
+  Future<void> _loginAnonymous() async {
+    final authservice = AuthService();
+
+    final user = await authservice.logwithGoogleIdToken();
+
+    final realmdb = Realm(
+      Configuration.flexibleSync(
+        user,
+        [
+          UserModel.schema,
+          ChargingStationModel.schema,
+          EvModel.schema,
+          ChargerTypeModel.schema,
+        ],
+      ),
+    );
+
+    realmdb.subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(realmdb.all<UserModel>());
+      mutableSubscriptions.add(realmdb.all<EvModel>());
+      mutableSubscriptions.add(realmdb.all<ChargerTypeModel>());
+      mutableSubscriptions.add(realmdb.all<ChargingStationModel>());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,11 +79,12 @@ class OnboardingMobileLayout extends StatelessWidget {
             height: 25,
           ),
           MaterialButton(
-            onPressed: () {
+            onPressed: () async {
+              await _loginAnonymous();
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const OtherUserProfilePage(),
+                  builder: (context) => const HomePage(),
                 ),
               );
             },

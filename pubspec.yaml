@@ -1,5 +1,5 @@
 name: spark_ev
-description: The Green Economy app.
+description: Spark ev app.
 
 publish_to: 'none' 
 
@@ -26,6 +26,9 @@ dependencies:
   flutter_polyline_points: ^1.0.0
   http: ^0.13.6
   dio: ^5.2.1+1
+  googleapis_auth: ^1.4.1
+  googleapis: ^11.2.0
+  firebase_core: ^2.14.0
   
 
 dev_dependencies:

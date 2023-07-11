@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:realm/realm.dart';
 import 'package:spark_ev/constants/colors.dart';
+import 'package:spark_ev/pages/home_page.dart';
 import 'package:spark_ev/pages/other_user_profile_page.dart';
 import 'package:spark_ev/services/auth_service.dart';
 
@@ -9,6 +10,8 @@ import '../models/charger_type.dart';
 import '../models/charging_station.dart';
 import '../models/ev.dart';
 import '../models/user_model.dart';
+
+enum EmailSignInFormType { signIn, register }
 
 class LoginMobileLayout extends StatefulWidget {
   const LoginMobileLayout({super.key});
@@ -18,9 +21,20 @@ class LoginMobileLayout extends StatefulWidget {
 }
 
 class _LoginMobileLayoutState extends State<LoginMobileLayout> {
+  EmailSignInFormType _formType = EmailSignInFormType.register;
   final _formKey = GlobalKey<FormState>();
   String? _email;
   String? _password;
+
+  void _toogleFormType() {
+    setState(() {
+      _formType = _formType == EmailSignInFormType.signIn
+          ? EmailSignInFormType.register
+          : EmailSignInFormType.signIn;
+    });
+    final form = _formKey.currentState!;
+    form.reset();
+  }
 
   bool _validateAndSaveForm() {
     final form = _formKey.currentState!;
@@ -32,13 +46,50 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
     return false;
   }
 
-  Future<void> _submit() async {
+  Future<void> _logInEmail() async {
+    try {
+      if ((_formType == EmailSignInFormType.signIn) &&
+          (_validateAndSaveForm())) {
+        await _logIn();
+        debugPrint('log in');
+      } else if (_validateAndSaveForm()) {
+        await _register();
+        debugPrint('register');
+      }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> _register() async {
+    final authservice = AuthService();
+    await authservice.createUserWithEmailAndPassword(_email!, _password!);
+    final user = await authservice.logwithEmailAndPassword(_email!, _password!);
+
+    final realmdb = Realm(
+      Configuration.flexibleSync(
+        user,
+        [
+          UserModel.schema,
+          ChargingStationModel.schema,
+          EvModel.schema,
+          ChargerTypeModel.schema,
+        ],
+      ),
+    );
+
+    realmdb.subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(realmdb.all<UserModel>());
+      mutableSubscriptions.add(realmdb.all<EvModel>());
+      mutableSubscriptions.add(realmdb.all<ChargerTypeModel>());
+      mutableSubscriptions.add(realmdb.all<ChargingStationModel>());
+    });
+  }
+
+  Future<void> _logIn() async {
     if (_validateAndSaveForm()) {
       final authservice = AuthService();
 
-      // final app = App(AppConfiguration('spark-ev-app-fltii'));
-      // final user = app.currentUser ?? await app.logIn(Credentials.anonymous());
-      await authservice.createUserWithEmailAndPassword(_email!, _password!);
       final user =
           await authservice.logwithEmailAndPassword(_email!, _password!);
 
@@ -63,14 +114,10 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
     }
   }
 
-  Future<void> _loginGoogleAuthCode() async {
+  Future<void> _loginGoogle() async {
     final authservice = AuthService();
 
-    // final app = App(AppConfiguration('spark-ev-app-fltii'));
-    // final user = app.currentUser ?? await app.logIn(Credentials.anonymous());
-
-    final user = await authservice.logwithGoogleAuthCode();
-    //final user = await authservice.logwithGoogleIdToken();
+    final user = await authservice.logwithGoogleIdToken();
 
     final realmdb = Realm(
       Configuration.flexibleSync(
@@ -92,8 +139,23 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
     });
   }
 
+  void _data() {
+    final authservice = AuthService();
+
+    final user = authservice.currentUser();
+
+    debugPrint(
+        'photo : ${user.profile.name}   photo : ${user.profile.lastName}   photo : ${user.profile.pictureUrl}    ');
+  }
+
   @override
   Widget build(BuildContext context) {
+    final primaryText = _formType == EmailSignInFormType.signIn
+        ? 'Log in'
+        : 'Create an account';
+    final secondaryText = _formType == EmailSignInFormType.signIn
+        ? 'Need an account? Register'
+        : 'Have an account? Log in';
     final Size size = MediaQuery.sizeOf(context);
     return SizedBox(
       height: size.height,
@@ -134,7 +196,7 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
             height: 25,
           ),
           Text(
-            'Take part in the green economy',
+            'Plan your Ev trips worldwide',
             style: GoogleFonts.inter(
               textStyle: const TextStyle(
                 height: 1.56,
@@ -149,7 +211,13 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
           ),
           OutlinedButton(
             onPressed: () async {
-              _loginGoogleAuthCode();
+              await _loginGoogle();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomePage(),
+                ),
+              );
             },
             style: OutlinedButton.styleFrom(
               fixedSize: const Size(248, 45),
@@ -162,6 +230,7 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
               ),
             ),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
                   'assets/images/new.png',
@@ -236,7 +305,13 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
           ),
           MaterialButton(
             onPressed: () async {
-              _submit();
+              await _logInEmail();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HomePage(),
+                ),
+              );
             },
             color: kblue9813424010,
             shape: const RoundedRectangleBorder(
@@ -247,7 +322,7 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
             height: 55,
             minWidth: 248,
             child: Text(
-              'Sign in',
+              primaryText,
               style: GoogleFonts.inter(
                 textStyle: const TextStyle(
                   color: kwhite25525525510,
@@ -259,6 +334,21 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
           ),
           const SizedBox(
             height: 30,
+          ),
+          TextButton(
+            onPressed: () async {
+              _toogleFormType();
+            },
+            child: Text(
+              secondaryText,
+              style: GoogleFonts.inter(
+                textStyle: const TextStyle(
+                  color: kblue9813424010,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -306,6 +396,7 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
             fontWeight: FontWeight.w500,
           ),
         ),
+        keyboardType: TextInputType.emailAddress,
         decoration: InputDecoration(
           prefixIcon: Image.asset(
             'assets/images/user1.png',

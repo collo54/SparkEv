@@ -1,10 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:spark_ev/constants/colors.dart';
-import 'package:spark_ev/pages/other_user_profile_page.dart';
+import 'package:spark_ev/pages/onboarding_page.dart';
+
+import '../services/auth_service.dart';
 
 class UserProfileMobileLayout extends StatelessWidget {
   const UserProfileMobileLayout({super.key});
+
+  String? _profileLetters() {
+    final authservice = AuthService();
+
+    final user = authservice.currentUser();
+    final name = user.profile.name;
+    List<String> firstLetters =
+        name!.split(' ').map((word) => word[0]).toList();
+    final first = firstLetters.elementAt(0);
+    final second = firstLetters.elementAt(1);
+    return '$first $second';
+  }
+
+  String? _dataUser() {
+    final authservice = AuthService();
+
+    final user = authservice.currentUser();
+    final name = user.profile.name;
+
+    return name;
+  }
+
+  Future<void> _logOut() async {
+    final authservice = AuthService();
+    final user = authservice.currentUser();
+    await authservice.logOut(user);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,31 +47,28 @@ class UserProfileMobileLayout extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
+              Container(
+                alignment: Alignment.center,
                 width: 40,
                 height: 40,
-                child: MaterialButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const OtherUserProfilePage(),
-                      ),
-                    );
-                  },
-                  elevation: 0,
-                  color: kwhite25525525510,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(8.0),
-                    ),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.all(
+                    Radius.circular(8),
                   ),
-                  height: 40,
-                  minWidth: 40,
-                  child: Image.asset(
-                    'assets/images/left2.png',
-                    width: 24,
-                    height: 24,
+                  shape: BoxShape.rectangle,
+                  color: kwhite25525525510,
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: const Padding(
+                    padding: EdgeInsets.only(left: 5),
+                    child: Icon(
+                      Icons.arrow_back_ios,
+                      color: kblue12915824210,
+                      size: 17,
+                    ),
                   ),
                 ),
               ),
@@ -51,7 +77,7 @@ class UserProfileMobileLayout extends StatelessWidget {
               ),
               Padding(
                 padding: const EdgeInsets.only(top: 60),
-                child: Stack(children: [
+                child: Stack(clipBehavior: Clip.none, children: [
                   GestureDetector(
                     onTap: () {},
                     child: Ink(
@@ -66,21 +92,46 @@ class UserProfileMobileLayout extends StatelessWidget {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.only(
-                          top: 26,
-                          bottom: 20,
-                          left: 14,
-                          right: 14,
+                          top: 6,
                         ),
-                        child: Text(
-                          'C M',
-                          style: GoogleFonts.inter(
-                            textStyle: const TextStyle(
-                              color: kwhite25525525510,
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
+                        child: Center(
+                          child: Text(
+                            _profileLetters() != null
+                                ? _profileLetters()!.toUpperCase()
+                                : 'n/a',
+                            style: GoogleFonts.inter(
+                              textStyle: const TextStyle(
+                                color: kwhite25525525510,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: -1,
+                    right: -3,
+                    child: Container(
+                      width: 25,
+                      height: 25,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: kblue9813424010,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    top: 1,
+                    right: -1,
+                    child: Container(
+                      width: 19,
+                      height: 19,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: kgreen11719013010,
                       ),
                     ),
                   ),
@@ -90,7 +141,15 @@ class UserProfileMobileLayout extends StatelessWidget {
                 width: 70,
               ),
               InkWell(
-                onTap: () {},
+                onTap: () async {
+                  await _logOut();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OnboardingPage(),
+                    ),
+                  );
+                },
                 child: Ink(
                   height: 42,
                   width: 42,
@@ -105,17 +164,10 @@ class UserProfileMobileLayout extends StatelessWidget {
                     shape: BoxShape.rectangle,
                     color: kblue9813424010,
                   ),
-                  child: Center(
-                    child: SizedBox(
-                      width: 15,
-                      height: 15,
-                      child: Image.asset(
-                        'assets/images/pencil.png',
-                        width: 15,
-                        height: 15,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                  child: const Icon(
+                    Icons.logout,
+                    color: kwhite25525525510,
+                    size: 17,
                   ),
                 ),
               ),
@@ -125,7 +177,7 @@ class UserProfileMobileLayout extends StatelessWidget {
             height: 17,
           ),
           Text(
-            'Collins Mutugi',
+            _dataUser() ?? ' Anonymous ',
             style: GoogleFonts.inter(
               textStyle: const TextStyle(
                 color: kwhite25525525510,
@@ -138,7 +190,7 @@ class UserProfileMobileLayout extends StatelessWidget {
             height: 7,
           ),
           Text(
-            'Software Developer',
+            'user',
             style: GoogleFonts.inter(
               textStyle: const TextStyle(
                 color: kwhite25525525510,
@@ -170,21 +222,20 @@ class UserProfileMobileLayout extends StatelessWidget {
                 SizedBox(
                   width: 40,
                   height: 40,
-                  child: MaterialButton(
-                    onPressed: () {},
-                    elevation: 0,
-                    color: kblue12915824210,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(8.0),
-                      ),
-                    ),
+                  child: Container(
+                    width: 40,
                     height: 40,
-                    minWidth: 40,
-                    child: Image.asset(
-                      'assets/images/pin.png',
-                      width: 15,
-                      height: 15,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(8),
+                      ),
+                      shape: BoxShape.rectangle,
+                      color: kblue12915824210,
+                    ),
+                    child: const Icon(
+                      Icons.location_on,
+                      color: kwhite25525525510,
+                      size: 17,
                     ),
                   ),
                 ),
@@ -232,27 +283,21 @@ class UserProfileMobileLayout extends StatelessWidget {
             width: 280,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
-              // mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
+                Container(
                   width: 40,
                   height: 40,
-                  child: MaterialButton(
-                    onPressed: () {},
-                    elevation: 0,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(8),
+                    ),
+                    shape: BoxShape.rectangle,
                     color: kblue12915824210,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(8.0),
-                      ),
-                    ),
-                    height: 40,
-                    minWidth: 40,
-                    child: Image.asset(
-                      'assets/images/clock.png',
-                      width: 15,
-                      height: 15,
-                    ),
+                  ),
+                  child: const Icon(
+                    Icons.access_time,
+                    color: kwhite25525525510,
+                    size: 17,
                   ),
                 ),
                 const SizedBox(

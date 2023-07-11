@@ -10,11 +10,17 @@ import 'package:spark_ev/pages/home_page.dart';
 import 'package:spark_ev/pages/login_page.dart';
 import 'package:spark_ev/pages/onboarding_page.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   /*
   final app = App(AppConfiguration('spark-ev-app-fltii'));
   final user = app.currentUser ?? await app.logIn(Credentials.anonymous());
@@ -62,7 +68,7 @@ class MyApp extends StatelessWidget {
         primaryColor: kwhite25525525510,
         useMaterial3: true,
       ),
-      home: const FullMapPage(),
+      home: const OnboardingPage(),
     );
   }
 }

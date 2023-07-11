@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>83247428077-d0u5nlkbe6k922cv09ned3gfv53psdka.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.83247428077-d0u5nlkbe6k922cv09ned3gfv53psdka</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>83247428077-c6tetj0ko92gj0t3s49o3qg21fl8v33f.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBRrC9XyNJzv_DXss-tJzj7No3j47kXIKA</string>
+	<key>GCM_SENDER_ID</key>
+	<string>83247428077</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.sparkEv.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>single-obelisk-389301</string>
+	<key>STORAGE_BUCKET</key>
+	<string>single-obelisk-389301.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:83247428077:ios:c8b8892b3445fe335477e4</string>
+</dict>
+</plist>

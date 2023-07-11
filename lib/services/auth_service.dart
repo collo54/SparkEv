@@ -2,14 +2,15 @@ import 'package:realm/realm.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 const List<String> scopes = <String>['email', 'profile', 'openid'];
+// 'openid'
 
 const String clientId =
-    '83247428077-c6tetj0ko92gj0t3s49o3qg21fl8v33f.apps.googleusercontent.com';
+    '83247428077-6ja72eae9lis4nedri1i4tu0uj06tk5j.apps.googleusercontent.com';
 
 class AuthService {
   final _googleSignIn = GoogleSignIn(
     scopes: scopes,
-    //clientId: clientId,
+    clientId: clientId,
   );
   final app = App(AppConfiguration('spark-ev-app-fltii'));
 
@@ -38,20 +39,21 @@ class AuthService {
 
   Future<User> logwithGoogleAuthCode() async {
     final googleUser = await _googleSignIn.signIn();
+    // final googleCode = googleUser!.serverAuthCode!;
     final googleAuth = await googleUser!.authentication;
-    // googleAuth.accessToken;
-    final googleAuthCodeCredentials =
-        Credentials.googleAuthCode(googleAuth.accessToken!);
-    final user = await app.logIn(googleAuthCodeCredentials);
+    final user =
+        await app.logIn(Credentials.googleAuthCode(googleAuth.accessToken!));
+
     return user;
   }
 
   Future<User> logwithGoogleIdToken() async {
     final googleUser = await _googleSignIn.signIn();
     final googleAuth = await googleUser!.authentication;
-    final googleIdTokenCredentials =
-        Credentials.googleIdToken(googleAuth.accessToken!);
-    final user = await app.logIn(googleIdTokenCredentials);
+
+    final user =
+        await app.logIn(Credentials.googleIdToken(googleAuth.idToken!));
+
     return user;
   }
 
