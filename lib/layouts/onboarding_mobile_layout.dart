@@ -14,18 +14,26 @@ import '../services/auth_service.dart';
 class OnboardingMobileLayout extends StatelessWidget {
   const OnboardingMobileLayout({super.key});
 
-  Future<void> _loginAnonymous() async {
+  Future<List<RealmResults>> _loginAnonymous() async {
     final authservice = AuthService();
 
-    final user = await authservice.logwithGoogleIdToken();
+    final user = await authservice.logInAnonymouly();
 
+    List<RealmResults> results = <RealmResults>[];
+
+    _realm(user, results);
+
+    return results;
+  }
+
+  void _realm(User user, List<RealmResults<Object?>> results) {
     final realmdb = Realm(
       Configuration.flexibleSync(
         user,
         [
           UserModel.schema,
           ChargingStationModel.schema,
-          EvModel.schema,
+          EvTripModel.schema,
           ChargerTypeModel.schema,
         ],
       ),
@@ -33,10 +41,22 @@ class OnboardingMobileLayout extends StatelessWidget {
 
     realmdb.subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(realmdb.all<UserModel>());
-      mutableSubscriptions.add(realmdb.all<EvModel>());
+      mutableSubscriptions.add(realmdb.all<EvTripModel>());
       mutableSubscriptions.add(realmdb.all<ChargerTypeModel>());
       mutableSubscriptions.add(realmdb.all<ChargingStationModel>());
     });
+
+    final userModelData = realmdb.all<UserModel>();
+    final evTripModelData = realmdb.all<EvTripModel>();
+    final chargerTypeModelData = realmdb.all<ChargerTypeModel>();
+    final chargingStationModelData = realmdb.all<ChargingStationModel>();
+
+    results.addAll([
+      userModelData,
+      evTripModelData,
+      chargerTypeModelData,
+      chargingStationModelData
+    ]);
   }
 
   @override
@@ -80,11 +100,14 @@ class OnboardingMobileLayout extends StatelessWidget {
           ),
           MaterialButton(
             onPressed: () async {
-              await _loginAnonymous();
+              final list = await _loginAnonymous();
+              // ignore: use_build_context_synchronously
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const HomePage(),
+                  builder: (context) => HomePage(
+                    item: list,
+                  ),
                 ),
               );
             },

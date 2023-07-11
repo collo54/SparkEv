@@ -55,12 +55,14 @@ class _HomePageMobileLayoutState extends State<HomePageMobileLayout> {
                   left: 15,
                   child: MaterialButton(
                     onPressed: () async {
+                      /*
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => const FullMapPage(),
                         ),
                       );
+                      */
                     },
                     color: kpurple13413323910,
                     shape: const RoundedRectangleBorder(

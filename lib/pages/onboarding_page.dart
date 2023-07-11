@@ -61,6 +61,7 @@ class OnboardingPage extends StatelessWidget {
           const SizedBox(
             width: 12,
           ),
+          /*
           SizedBox(
             width: 50,
             height: 30,
@@ -85,6 +86,7 @@ class OnboardingPage extends StatelessWidget {
               ),
             ),
           ),
+          */
           const SizedBox(
             width: 20,
           ),

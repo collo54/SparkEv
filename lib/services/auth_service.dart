@@ -57,9 +57,9 @@ class AuthService {
     return user;
   }
 
-  User currentUser() {
+  User? currentUser() {
     final user = app.currentUser;
-    return user!;
+    return user;
   }
 
   Future<void> logOut(User user) async {

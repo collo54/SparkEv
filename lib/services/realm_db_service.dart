@@ -8,32 +8,33 @@ class RealmDbService {
   });
   final Realm realmdb;
 
-  void createEvModel(EvModel evModel) {
+  void createEvTripModel(EvTripModel evTripModel) {
     realmdb.write(() {
-      realmdb.add(evModel);
+      realmdb.add(evTripModel);
     });
-    debugPrint('inserted evmodel');
+    debugPrint('inserted evTripmodel');
   }
 
-  RealmResults<EvModel> readEvModels() {
-    final evmodels = realmdb.all<EvModel>();
+  RealmResults<EvTripModel> readEvTripModels() {
+    final evTripmodels = realmdb.all<EvTripModel>();
 
-    for (final model in evmodels) {
-      debugPrint('${model.id} ${model.continent} ${model.id}');
+    for (final model in evTripmodels) {
+      debugPrint(
+          '${model.id} ${model.countryChargingStation} ${model.totalCost}');
     }
-    return evmodels;
+    return evTripmodels;
   }
 
-  void updateEvModel(EvModel evModel) {
+  void updateEvTripModel(EvTripModel evTripModel) {
     realmdb.write(() {
-      realmdb.add(evModel, update: true);
+      realmdb.add(evTripModel, update: true);
     });
     debugPrint('updated ev model');
   }
 
-  void deleteEvModel(EvModel evModel) {
+  void deleteEvTripModel(EvTripModel evTripModel) {
     realmdb.write(() {
-      realmdb.delete(evModel);
+      realmdb.delete(evTripModel);
     });
     debugPrint('deleted ev moel');
   }

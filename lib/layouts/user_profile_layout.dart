@@ -7,24 +7,31 @@ import '../services/auth_service.dart';
 
 class UserProfileMobileLayout extends StatelessWidget {
   const UserProfileMobileLayout({super.key});
+  //final date = DateFormat.yMEd().add_jms().format(DateTime.now());
 
   String? _profileLetters() {
     final authservice = AuthService();
 
     final user = authservice.currentUser();
-    final name = user.profile.name;
-    List<String> firstLetters =
-        name!.split(' ').map((word) => word[0]).toList();
-    final first = firstLetters.elementAt(0);
-    final second = firstLetters.elementAt(1);
-    return '$first $second';
+
+    final name = user?.profile.name;
+    if (name != null) {
+      List<String>? firstLetters =
+          name?.split(' ').map((word) => word[0]).toList();
+      final first = firstLetters?.elementAt(0);
+      final second = firstLetters?.elementAt(1);
+
+      return '$first $second';
+    } else {
+      return '';
+    }
   }
 
   String? _dataUser() {
     final authservice = AuthService();
 
     final user = authservice.currentUser();
-    final name = user.profile.name;
+    final name = user?.profile.name;
 
     return name;
   }
@@ -32,7 +39,7 @@ class UserProfileMobileLayout extends StatelessWidget {
   Future<void> _logOut() async {
     final authservice = AuthService();
     final user = authservice.currentUser();
-    await authservice.logOut(user);
+    await authservice.logOut(user!);
   }
 
   @override

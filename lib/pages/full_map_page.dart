@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:realm/realm.dart';
 import 'package:spark_ev/apis/big_query.dart';
 import 'package:spark_ev/apis/repository.dart';
 import 'package:spark_ev/apis/uri.dart';
 import 'package:spark_ev/constants/colors.dart';
 import 'package:spark_ev/models/destination.dart';
+import 'package:spark_ev/models/ev.dart';
 import 'package:spark_ev/models/latlang.dart';
 import 'package:spark_ev/models/location.dart';
 import 'package:spark_ev/models/origin.dart';
@@ -15,14 +17,22 @@ import 'package:spark_ev/models/routes_modifires.dart';
 import 'package:spark_ev/models/routes_request.dart';
 import 'package:spark_ev/models/routes_response.dart';
 
+import '../services/auth_service.dart';
+import '../services/list_bloc.dart';
+
 class FullMapPage extends StatefulWidget {
-  const FullMapPage({Key? key}) : super(key: key);
+  const FullMapPage({
+    Key? key,
+    required this.bloc,
+  }) : super(key: key);
+  final ListBloc bloc;
 
   @override
   State<FullMapPage> createState() => _FullMapPageState();
 }
 
 class _FullMapPageState extends State<FullMapPage> {
+  final auth = AuthService();
   late GoogleMapController _mapController;
   Marker? _origin;
   Marker? _destination;
@@ -469,6 +479,7 @@ class _FullMapPageState extends State<FullMapPage> {
 
       if (responseModel.routeItems.isNotEmpty &&
           reverseLocation.results.isNotEmpty) {
+        final userid = auth.currentUser()!.id;
         final polylineEncoded =
             responseModel.routeItems.first.polylineModel.encodedPolyline;
         final distance = responseModel.routeItems.first.distanceMeters;
@@ -491,6 +502,25 @@ class _FullMapPageState extends State<FullMapPage> {
           electricPricePerKwhUSD: electricPrice,
           kwhPer100Miles: 20,
         );
+        final travelCost = double.parse(cost);
+
+        final evtrip = EvTripModel(
+          ObjectId(),
+          userid,
+          countryName,
+          _origin!.position.latitude,
+          _origin!.position.longitude,
+          _intermediate!.position.latitude,
+          _intermediate!.position.longitude,
+          _destination!.position.latitude,
+          _destination!.position.longitude,
+          travelCost,
+          electricPrice,
+          miles,
+        );
+
+        widget.bloc.addNewItem2(evtrip);
+
         debugPrint('Price per kwh in $countryName is $kwhpercountry USD');
         setState(() {
           _costOfJourney = cost;

@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:realm/realm.dart';
 import 'package:spark_ev/constants/colors.dart';
 import 'package:spark_ev/pages/home_page.dart';
-import 'package:spark_ev/pages/other_user_profile_page.dart';
 import 'package:spark_ev/services/auth_service.dart';
 
 import '../models/charger_type.dart';
@@ -46,86 +45,68 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
     return false;
   }
 
-  Future<void> _logInEmail() async {
+  Future<List<RealmResults>?> _logInEmail() async {
     try {
       if ((_formType == EmailSignInFormType.signIn) &&
           (_validateAndSaveForm())) {
-        await _logIn();
+        final list = await _logIn();
         debugPrint('log in');
+        return list;
       } else if (_validateAndSaveForm()) {
-        await _register();
+        final list1 = await _register();
         debugPrint('register');
+        return list1;
       }
     } catch (e) {
       print(e.toString());
     }
+    return null;
   }
 
-  Future<void> _register() async {
+  Future<List<RealmResults>> _register() async {
     final authservice = AuthService();
     await authservice.createUserWithEmailAndPassword(_email!, _password!);
     final user = await authservice.logwithEmailAndPassword(_email!, _password!);
 
-    final realmdb = Realm(
-      Configuration.flexibleSync(
-        user,
-        [
-          UserModel.schema,
-          ChargingStationModel.schema,
-          EvModel.schema,
-          ChargerTypeModel.schema,
-        ],
-      ),
-    );
+    List<RealmResults> results = <RealmResults>[];
 
-    realmdb.subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(realmdb.all<UserModel>());
-      mutableSubscriptions.add(realmdb.all<EvModel>());
-      mutableSubscriptions.add(realmdb.all<ChargerTypeModel>());
-      mutableSubscriptions.add(realmdb.all<ChargingStationModel>());
-    });
+    _realm(user, results);
+
+    return results;
   }
 
-  Future<void> _logIn() async {
-    if (_validateAndSaveForm()) {
-      final authservice = AuthService();
+  Future<List<RealmResults>> _logIn() async {
+    final authservice = AuthService();
 
-      final user =
-          await authservice.logwithEmailAndPassword(_email!, _password!);
+    final user = await authservice.logwithEmailAndPassword(_email!, _password!);
 
-      final realmdb = Realm(
-        Configuration.flexibleSync(
-          user,
-          [
-            UserModel.schema,
-            ChargingStationModel.schema,
-            EvModel.schema,
-            ChargerTypeModel.schema,
-          ],
-        ),
-      );
+    List<RealmResults> results = <RealmResults>[];
 
-      realmdb.subscriptions.update((mutableSubscriptions) {
-        mutableSubscriptions.add(realmdb.all<UserModel>());
-        mutableSubscriptions.add(realmdb.all<EvModel>());
-        mutableSubscriptions.add(realmdb.all<ChargerTypeModel>());
-        mutableSubscriptions.add(realmdb.all<ChargingStationModel>());
-      });
-    }
+    _realm(user, results);
+
+    return results;
   }
 
-  Future<void> _loginGoogle() async {
+  Future<List<RealmResults>> _loginGoogle() async {
     final authservice = AuthService();
 
     final user = await authservice.logwithGoogleIdToken();
 
+    List<RealmResults> results = <RealmResults>[];
+
+    _realm(user, results);
+
+    return results;
+  }
+
+  void _realm(User user, List<RealmResults<Object?>> results) {
     final realmdb = Realm(
       Configuration.flexibleSync(
         user,
         [
           UserModel.schema,
           ChargingStationModel.schema,
-          EvModel.schema,
+          EvTripModel.schema,
           ChargerTypeModel.schema,
         ],
       ),
@@ -133,19 +114,22 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
 
     realmdb.subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(realmdb.all<UserModel>());
-      mutableSubscriptions.add(realmdb.all<EvModel>());
+      mutableSubscriptions.add(realmdb.all<EvTripModel>());
       mutableSubscriptions.add(realmdb.all<ChargerTypeModel>());
       mutableSubscriptions.add(realmdb.all<ChargingStationModel>());
     });
-  }
 
-  void _data() {
-    final authservice = AuthService();
+    final userModelData = realmdb.all<UserModel>();
+    final evTripModelData = realmdb.all<EvTripModel>();
+    final chargerTypeModelData = realmdb.all<ChargerTypeModel>();
+    final chargingStationModelData = realmdb.all<ChargingStationModel>();
 
-    final user = authservice.currentUser();
-
-    debugPrint(
-        'photo : ${user.profile.name}   photo : ${user.profile.lastName}   photo : ${user.profile.pictureUrl}    ');
+    results.addAll([
+      userModelData,
+      evTripModelData,
+      chargerTypeModelData,
+      chargingStationModelData
+    ]);
   }
 
   @override
@@ -211,11 +195,15 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
           ),
           OutlinedButton(
             onPressed: () async {
-              await _loginGoogle();
+              List<RealmResults> result = await _loginGoogle();
+
+              // ignore: use_build_context_synchronously
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const HomePage(),
+                  builder: (context) => HomePage(
+                    item: result,
+                  ),
                 ),
               );
             },
@@ -305,13 +293,19 @@ class _LoginMobileLayoutState extends State<LoginMobileLayout> {
           ),
           MaterialButton(
             onPressed: () async {
-              await _logInEmail();
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HomePage(),
-                ),
-              );
+              final list = await _logInEmail();
+
+              if (list != null) {
+                // ignore: use_build_context_synchronously
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => HomePage(
+                      item: list,
+                    ),
+                  ),
+                );
+              }
             },
             color: kblue9813424010,
             shape: const RoundedRectangleBorder(

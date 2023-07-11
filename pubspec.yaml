@@ -29,6 +29,9 @@ dependencies:
   googleapis_auth: ^1.4.1
   googleapis: ^11.2.0
   firebase_core: ^2.14.0
+  flutter_launcher_icons: ^0.13.1
+  intl: ^0.18.0
+
   
 
 dev_dependencies:
@@ -37,6 +40,24 @@ dev_dependencies:
 
   flutter_lints: ^2.0.0
   change_app_package_name: ^1.1.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/launchicon.png"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/images/launchicon.png"
+    background_color: "#F8A942"
+    theme_color: "#F8A942"
+  windows:
+    generate: true
+    image_path: "assets/images/launchicon.png"
+    icon_size: 48 # min:48, max:256, default: 48
+  macos:
+    generate: true
+    image_path: "assets/images/launchicon.png"   
 
 flutter:
 
